@@ -1255,15 +1255,16 @@ cdef class BasisExchangeMatroid(Matroid):
                 self._whitney_numbers2_rec(f_vec, flats, todo, e + 1, i + 1)
             e = bitset_next(todo[i], e)
 
-    cpdef SetSystem flats(self, long k):
+    cpdef SetSystem flats(self, long k=-1):
         """
-        Return the collection of flats of the matroid of specified rank.
+        Return the flats of the matroid.
 
         A *flat* is a closed set.
 
         INPUT:
 
-        - ``k`` -- integer
+        - ``k`` -- integer (optional); if specified, return the rank-`k`
+          flats of the matroid
 
         OUTPUT: :class:`SetSystem`
 
@@ -1283,6 +1284,12 @@ cdef class BasisExchangeMatroid(Matroid):
             sage: len(M.flats(4))
             1
         """
+        cdef list F = []
+        if k == -1:
+            for i in range(self.rank() + 1):
+                F.extend(list(self.flats(i)))
+            return SetSystem(self._E, F)
+
         cdef bitset_t *flats
         cdef bitset_t *todo
         if k < 0 or k > self.full_rank():
